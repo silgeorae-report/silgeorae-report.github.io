@@ -1,20 +1,20 @@
 {
  "weights": {
   "theme": {
-   "midnight": 1.0,
-   "ember": 0.93,
+   "midnight": 2.5,
+   "ember": 1.2,
    "paper": 1.0,
-   "forest": 2.5
+   "forest": 1.76
   },
   "hook": {
    "question": 1.0,
    "number": 1.0,
-   "contrast": 2.12
+   "contrast": 1.56
   },
   "photo": {
    "on": 1.0,
    "off": 1.0,
-   "clip": 2.5
+   "clip": 1.79
   }
  },
  "lessons": [
@@ -198,7 +198,29 @@
      "clip": 2.5
     }
    }
+  },
+  {
+   "at": "2026-11-21",
+   "scored": 19,
+   "weights": {
+    "theme": {
+     "midnight": 2.5,
+     "ember": 1.2,
+     "paper": 1.0,
+     "forest": 1.76
+    },
+    "hook": {
+     "question": 1.0,
+     "number": 1.0,
+     "contrast": 1.56
+    },
+    "photo": {
+     "on": 1.0,
+     "off": 1.0,
+     "clip": 1.79
+    }
+   }
   }
  ],
- "updated_at": "2026-11-20T17:10:50+00:00"
+ "updated_at": "2026-11-21T16:53:30+00:00"
 }
