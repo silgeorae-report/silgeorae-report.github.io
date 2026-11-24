@@ -1,7 +1,7 @@
 """성과 평가 → 개선안 → 다음 콘텐츠에 반영하는 학습 고리.
 
 1) 실험: 영상마다 실험 변수(테마·도입부 유형·사진 배경)를 가중치에 따라 고른다 (choose).
-2) 평가: 게시 후 2일이 지난 영상의 조회수를 채널별 중앙값으로 나눈 상대 점수로 본다 (score).
+2) 평가: 게시 후 2일이 지난 영상의 조회수를 채널 안 순위 백분위(0.5~1.5)로 바꿔 채널 평균을 낸다 (score).
 3) 개선: 변수 값별 평균 점수로 가중치를 고친다. 표본이 3개 미만인 값은 계속 시험한다.
         일주일에 한 번 Claude가 상·하위 영상을 비교해 제목·도입부 교훈을 뽑는다 (update).
 4) 적용: 가중치와 교훈은 data/playbook.json 에 저장되고, 다음 대본 지침과 렌더 설정에 들어간다 (guidance).
@@ -75,8 +75,25 @@ def guidance(pb: dict, variant: dict) -> str:
     return "\n".join(lines)
 
 
+def _rank_scores(vals: dict) -> dict:
+    """채널 안에서의 순위 백분위 → 0.5(최하)~1.5(최상). 동점은 같은 점수.
+
+    조회수 비율((v+1)/(중앙값+1))은 중앙값이 0인 채널(초기 TikTok)에서 한 편이 48배로 계산돼
+    가중치가 모두 상한에 붙었다 (11-25 확인). 순위는 한 편의 대박·0회 몰림에 흔들리지 않는다."""
+    xs = sorted(vals.values())
+    if len(xs) < 2 or xs[0] == xs[-1]:
+        return {}   # 모두 같으면(예: 좋아요 전부 0) 구분할 정보가 없다
+    n = len(xs) - 1
+    out = {}
+    for slug, v in vals.items():
+        lo = xs.index(v)
+        hi = len(xs) - 1 - xs[::-1].index(v)
+        out[slug] = 0.5 + ((lo + hi) / 2) / n
+    return out
+
+
 def score(conn) -> dict:
-    """slug → 상대 점수(1.0 = 그 채널의 보통). 조회수가 없는 채널은 좋아요+댓글로 본다."""
+    """slug → 상대 점수(1.0 = 그 채널의 중간). 조회수가 없는 채널은 좋아요+댓글로 본다."""
     metrics._ensure(conn)
     cutoff = (datetime.now(timezone.utc) - timedelta(days=MIN_AGE_DAYS)).isoformat()
     per_platform: dict = {}
@@ -92,11 +109,8 @@ def score(conn) -> dict:
         per_platform.setdefault(r["platform"], {})[r["slug"]] = val
     rel: dict = {}
     for plat, vals in per_platform.items():
-        if len(vals) < 2:
-            continue
-        med = statistics.median(vals.values())
-        for slug, v in vals.items():
-            rel.setdefault(slug, []).append((v + 1) / (med + 1))
+        for slug, v in _rank_scores(vals).items():
+            rel.setdefault(slug, []).append(v)
     return {s: round(statistics.mean(x), 3) for s, x in rel.items()}
 
 
@@ -116,11 +130,13 @@ def update(conn, writer_factory=None) -> dict:
     for d, vals in DIMS.items():
         for v in vals:
             xs = stats[d].get(v, [])
-            pb["weights"][d][v] = round(min(2.5, max(0.4, statistics.mean(xs))), 2) if len(xs) >= MIN_SAMPLES else 1.0
+            # 점수 범위가 0.5~1.5라 제곱으로 차이를 키운다 (평균 1.2 → 가중치 1.44)
+            pb["weights"][d][v] = round(min(2.5, max(0.4, statistics.mean(xs) ** 2)), 2) if len(xs) >= MIN_SAMPLES else 1.0
     summary = {"scored": len(scores), "weights": pb["weights"],
                "samples": {d: {v: len(x) for v, x in s.items()} for d, s in stats.items()}}
 
-    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    # 매일 01:00 실행 시각이 몇 분씩 흔들려 정확히 7일이면 한 번 건너뛴다 (11-24 4분 차이로 미갱신)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=6, hours=20)).isoformat()
     due = not pb["lessons_at"] or pb["lessons_at"] < week_ago
     if writer_factory and due and len(scores) >= 8:
         ranked = sorted(scores.items(), key=lambda kv: -kv[1])
@@ -132,7 +148,8 @@ def update(conn, writer_factory=None) -> dict:
         system = ("당신은 부동산 데이터 숏폼 채널의 성과 분석가입니다. 아래는 영상별 상대 성과(1.0이 보통)와 제목, "
                   "실험 변수입니다. 상위와 하위를 비교해 다음 영상의 제목과 도입부에 바로 적용할 수 있는 구체적인 "
                   "교훈을 최대 5개 쓰세요. 표본이 적어 확실하지 않은 것은 쓰지 마세요. "
-                  "낚시성 표현, 투자 권유, 가격 전망 단정은 교훈으로 쓸 수 없습니다. 숫자를 직접 쓰지 말고 원칙만 쓰세요.")
+                  "낚시성 표현, 투자 권유, 가격 전망 단정은 교훈으로 쓸 수 없습니다. 숫자를 직접 쓰지 말고 원칙만 쓰세요. "
+                  "교훈은 대본(제목·설명·장면 문장)에 바로 쓸 수 있는 것만 쓰세요. 어느 구를 먼저 만들지 같은 제작 순서는 대본 작성자가 바꿀 수 없으니 쓰지 마세요.")
         try:
             res = writer_factory()._call(system, table, LESSON_SCHEMA, "medium", 2000)
             pb["lessons"] = [str(x)[:200] for x in res.get("lessons", [])][:5]

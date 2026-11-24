@@ -401,6 +401,14 @@ class MediaFallbackTest(unittest.TestCase):
         self.assertTrue(assets.PEOPLE_TAGS.search("seoul, woman, street"))
         self.assertFalse(assets.PEOPLE_TAGS.search("seoul, skyline, apartment, manhattan"))
 
+    def test_rank_scores_robust_to_zero_median(self):
+        from pipeline import learn
+        r = learn._rank_scores({"a": 0, "b": 0, "c": 0, "d": 139})
+        self.assertEqual(r["d"], 1.5)
+        self.assertLess(r["a"], 1.0)
+        self.assertEqual(r["a"], r["b"])
+        self.assertEqual(learn._rank_scores({"a": 0, "b": 0}), {})
+
     def test_instagram_insights_views(self):
         from unittest import mock
         from pipeline import metrics
