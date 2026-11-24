@@ -131,12 +131,21 @@ def collect_instagram(conn) -> int:
     return n
 
 
+_IG_ERR_LOGGED = False
+
+
 def _ig_insights(media_id: str, tok: str) -> tuple[int | None, int | None]:
     """릴스 조회 수·공유 수 (인사이트 권한 필요). 실패하면 (None, None)."""
     try:
         r = requests.get(f"https://graph.facebook.com/{media_id}/insights", timeout=30,
                          params={"metric": "views,shares", "access_token": tok})
         if r.status_code != 200:
+            global _IG_ERR_LOGGED
+            if not _IG_ERR_LOGGED:  # 공개 로그이므로 메시지(ID 포함 가능) 대신 코드만
+                _IG_ERR_LOGGED = True
+                e = (r.json() if r.headers.get("content-type", "").startswith("application/json") else {}).get("error", {})
+                print(f"[metrics] instagram insights 실패: HTTP {r.status_code}, type={e.get('type')}, "
+                      f"code={e.get('code')}, subcode={e.get('error_subcode')}")
             return None, None
         got = {}
         for d in r.json().get("data", []):

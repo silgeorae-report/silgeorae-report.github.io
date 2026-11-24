@@ -77,6 +77,17 @@ class QATest(unittest.TestCase):
         ok = qa.check("gu_monthly", self.draft("중간값은 가격을 순서대로 늘어놓았을 때 가운데 값입니다."), self.facts, self.cfg)
         self.assertEqual(ok, [])
 
+    def test_report_lag_sentence_rejected(self):
+        for s in ["실거래 신고는 계약 후 일정 기간 안에 하면 되므로 최근 계약분이 늘 수 있습니다.",
+                  "실거래가는 계약 후 신고까지 시차가 있습니다.",
+                  "최근 거래는 아직 다 반영되지 않았을 수 있습니다.",
+                  "최근 몇 주의 거래는 이후 추가 신고로 늘어날 수 있습니다."]:
+            p = qa.check("gu_monthly", self.draft(s), self.facts, self.cfg)
+            self.assertTrue(any("중복 안내" in x for x in p), s)
+        ok = qa.check("gu_monthly", self.draft("신고가 거래는 기존 최고 거래가를 넘어선 거래입니다. 기간 중 거래를 정리했습니다."),
+                      self.facts, self.cfg)
+        self.assertEqual(ok, [])
+
     def test_raw_number_rejected(self):
         p = qa.check("gu_monthly", self.draft("거래는 135건으로 늘었습니다."), self.facts, self.cfg)
         self.assertTrue(any("135" in x for x in p))
@@ -367,6 +378,15 @@ class AlignTrendTest(unittest.TestCase):
         self.assertEqual(shorts.align_trend(trend, {"trade_count": "98건"})[-1], ("202610", 98, 6.05))
         self.assertEqual(shorts.align_trend(trend, {})[-1], ("202610", 101, 6.05))
         self.assertEqual(shorts.align_trend([], {"trade_count": "98건"}), [])
+
+    def test_last_point_matches_post_median(self):
+        from pipeline import shorts
+        trend = [("202608", 203, 71000), ("202609", 205, 73700)]
+        out = shorts.align_trend(trend, {"trade_count": "202건", "median_price": "7억 3,900만원"})
+        self.assertEqual(out[-1], ("202609", 202, 73900))
+        self.assertEqual(shorts.align_trend(trend, {"median_price": "9,800만원"})[-1][2], 9800)
+        self.assertEqual(shorts.align_trend(trend, {"median_price": "12억원"})[-1][2], 120000)
+        self.assertEqual(shorts.align_trend(trend, {"median_price": "자료 없음"})[-1][2], 73700)
 
 
 class MediaFallbackTest(unittest.TestCase):

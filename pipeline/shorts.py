@@ -1,5 +1,6 @@
 """월간 리포트 글 → 숏폼 세로 영상(mp4). 같은 facts를 쓰므로 블로그와 숫자가 항상 일치한다."""
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -54,15 +55,29 @@ def check_script(script: dict, facts: dict, cfg: dict) -> list[str]:
     return problems
 
 
-def align_trend(trend: list, facts: dict) -> list:
-    """이번 달 막대의 건수를 글·내레이션(facts)의 건수와 맞춘다.
+def _manwon(text) -> int | None:
+    """'7억 3,900만원' → 73900 (만원 단위). 읽을 수 없으면 None."""
+    m = re.fullmatch(r"\s*(?:(\d+)억)?\s*(?:([\d,]+)만)?원\s*", str(text or ""))
+    if not m or not (m.group(1) or m.group(2)):
+        return None
+    return int(m.group(1) or 0) * 10000 + int((m.group(2) or "0").replace(",", ""))
 
-    글을 쓴 뒤 추가 신고로 DB 건수가 늘면 화면에 '거래 98건'과 막대 숫자 '101건'이 함께 나온다."""
-    digits = "".join(ch for ch in str(facts.get("trade_count", "")) if ch.isdigit())
-    if not trend or not digits:
+
+def align_trend(trend: list, facts: dict) -> list:
+    """이번 달 막대의 건수와 선 끝의 중위가를 글·내레이션(facts) 값과 맞춘다.
+
+    글을 쓴 뒤 추가 신고로 DB 값이 바뀌면 화면에 '거래 98건'과 막대 '101건',
+    '중위가 7억 3,900만원'과 선 끝 '7억 3,700만원'이 함께 나온다 (11-19 건수, 11-24 중위가)."""
+    if not trend:
         return trend
-    ym, _, median = trend[-1]
-    return list(trend[:-1]) + [(ym, int(digits), median)]
+    ym, count, median = trend[-1]
+    digits = "".join(ch for ch in str(facts.get("trade_count", "")) if ch.isdigit())
+    if digits:
+        count = int(digits)
+    fixed = _manwon(facts.get("median_price"))
+    if fixed is not None:
+        median = fixed
+    return list(trend[:-1]) + [(ym, count, median)]
 
 
 def produce(conn, cfg, writer, post, out_dir: Path = VIDEO_DIR) -> tuple[bool, list[str]]:
