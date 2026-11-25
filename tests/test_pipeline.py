@@ -150,6 +150,10 @@ class EndToEndTest(unittest.TestCase):
             n = site.build(conn, cfg, out)
             self.assertEqual(n, len(jobs))
             self.assertTrue((out / "sitemap.xml").exists())
+            # 서치 콘솔 소유권 확인 파일이 매 빌드마다 배포돼야 함
+            vf = out / "google0ca3dda0f1e228c8.html"
+            self.assertEqual(vf.read_text(encoding="utf-8").strip(),
+                             "google-site-verification: google0ca3dda0f1e228c8.html")
             html = (out / "posts" / jobs[0]["slug"] / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("{{", html)
             conn.close()

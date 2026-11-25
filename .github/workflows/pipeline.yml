@@ -3,7 +3,13 @@ name: daily-pipeline
 on:
   schedule:
     - cron: "0 16 * * *"   # 매일 01:00 KST (Claude 구독 사용량이 큰 작업은 새벽 1~3시에)
-  workflow_dispatch: {}      # Actions 탭에서 수동 실행
+  workflow_dispatch:         # Actions 탭에서 수동 실행
+    inputs:
+      mode:
+        description: "all = 전체 실행, build = 사이트만 다시 빌드·배포 (콘텐츠 생성·업로드 없음)"
+        default: all
+        type: choice
+        options: [all, build]
 
 permissions:
   contents: write
@@ -58,7 +64,7 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
         run: |
           set +e
-          python -m pipeline.run all
+          python -m pipeline.run "${{ inputs.mode || 'all' }}"
           echo "status=$?" >> "$GITHUB_OUTPUT"
           echo '### 실행 결과' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
@@ -103,6 +109,7 @@ jobs:
   instagram:
     # Pages 배포 후 실행: 방금 올라간 public/media/*.mp4 URL로 릴스 게시
     needs: deploy
+    if: ${{ (inputs.mode || 'all') == 'all' }}
     runs-on: ubuntu-latest
     outputs:
       status: ${{ steps.ig.outputs.status }}
