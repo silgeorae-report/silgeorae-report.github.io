@@ -283,6 +283,40 @@ class ShortsTest(unittest.TestCase):
             self.assertNotIn(posts[0]["slug"], [p["slug"] for p in shorts.plan(conn, cfg)])
             conn.close()
 
+    def test_too_long_audio_retries_shorter_script(self):
+        from unittest import mock
+        from pipeline import shorts
+        cfg = load_config()
+        cfg["shorts"]["tts_provider"] = "silent"
+        seen = []
+
+        class Recorder(FakeWriter):
+            def write_shorts(self, facts, feedback=None, guidance=""):
+                seen.append(feedback)
+                return super().write_shorts(facts, feedback, guidance)
+
+        real_speak = shorts.tts.speak
+        calls = {"n": 0}
+
+        def speak(text, out, provider, voice):
+            real_speak(text, out, provider, voice)
+            calls["n"] += 1
+            return 20.0 if calls["n"] <= len(shorts.SHORTS_SCENES) else 3.0   # 첫 대본만 한도 초과
+
+        with tempfile.TemporaryDirectory() as tmp:
+            conn = db.connect(Path(tmp) / "t.db")
+            db.upsert_trades(conn, make_trades(["11680"], today=date(2026, 11, 14)))
+            for job in generate.plan(conn, cfg, date(2026, 11, 14)):
+                if job["kind"] == "gu_monthly":
+                    generate.produce(conn, cfg, FakeWriter(), job, "2026-11-14")
+            post = shorts.plan(conn, cfg)[0]
+            with mock.patch.object(shorts.tts, "speak", speak):
+                ok, problems = shorts.produce(conn, cfg, Recorder(), post, Path(tmp) / "v")
+            self.assertTrue(ok, problems)
+            self.assertEqual(len(seen), 2)
+            self.assertTrue(any("짧게" in f for f in seen[1]))
+            conn.close()
+
 
 
 
@@ -387,6 +421,18 @@ class AlignTrendTest(unittest.TestCase):
         self.assertEqual(shorts.align_trend(trend, {"median_price": "9,800만원"})[-1][2], 9800)
         self.assertEqual(shorts.align_trend(trend, {"median_price": "12억원"})[-1][2], 120000)
         self.assertEqual(shorts.align_trend(trend, {"median_price": "자료 없음"})[-1][2], 73700)
+
+
+class ClipThemeTest(unittest.TestCase):
+    def test_light_theme_on_dark_clip_uses_light_text(self):
+        from pipeline import motion
+        clip = motion.ClipBackground(Path("none.mp4"))     # 열지 않음: 종류만 판별
+        paper = motion.THEMES["paper"]
+        self.assertEqual(motion.readable_theme(paper, clip)["text"], "#ffffff")
+        self.assertEqual(motion.readable_theme(paper, None)["text"], paper["text"])   # 그라데이션
+        self.assertIs(motion.readable_theme(motion.THEMES["midnight"], clip), motion.THEMES["midnight"])
+        for name, th in motion.THEMES.items():
+            self.assertEqual(motion.is_light(th), name == "paper")
 
 
 class MediaFallbackTest(unittest.TestCase):

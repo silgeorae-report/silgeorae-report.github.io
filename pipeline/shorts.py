@@ -63,6 +63,13 @@ def _manwon(text) -> int | None:
     return int(m.group(1) or 0) * 10000 + int((m.group(2) or "0").replace(",", ""))
 
 
+def length_feedback(total: float, limit: float) -> str:
+    """음성 길이 초과 시 대본 재작성 지침. 여유를 두고 줄일 비율을 알려 준다."""
+    cut = max(10, round((1 - (limit - 3) / total) * 100))
+    return (f"내레이션을 모두 읽으면 {total:.1f}초로 {limit}초 한도를 넘습니다. "
+            f"각 장면 내레이션을 약 {cut}% 짧게 줄이세요. 수치는 그대로 두고 꾸밈말·반복 설명을 빼세요.")
+
+
 def align_trend(trend: list, facts: dict) -> list:
     """이번 달 막대의 건수와 선 끝의 중위가를 글·내레이션(facts) 값과 맞춘다.
 
@@ -88,35 +95,40 @@ def produce(conn, cfg, writer, post, out_dir: Path = VIDEO_DIR) -> tuple[bool, l
     try:
         playbook = learn.load()
         variant = learn.choose(playbook, post["slug"])
+        s = cfg["shorts"]
+        site = cfg["site"]
         script, problems, feedback = None, [], None
-        for _ in range(2):
-            script = writer.write_shorts(facts, feedback, learn.guidance(playbook, variant))
-            problems = check_script(script, facts, cfg)
-            if not problems:
+        # 음성 길이가 한도를 넘으면 '더 짧게' 피드백으로 대본을 한 번 더 쓴다 (11-21 종로 59.2초, 11-25 강동 58.1초)
+        for length_try in range(2):
+            for _ in range(2):
+                script = writer.write_shorts(facts, feedback, learn.guidance(playbook, variant))
+                problems = check_script(script, facts, cfg)
+                if not problems:
+                    break
+                feedback = problems
+            if problems:
+                db.log_rejection(conn, "video:" + post["slug"], problems)
+                return False, problems
+
+            # 1) 음성을 먼저 만들어 장면 길이를 정한다
+            parts, total = [], 0.0
+            for i, k in enumerate(SHORTS_SCENES):
+                sc = script["scenes"][k]
+                narration = qa.fill(sc["narration"], facts)
+                audio = work / f"{i}.mp3"
+                secs = tts.speak(narration, audio, s["tts_provider"], s["voice"]) + 0.35
+                parts.append((k, qa.fill(sc["headline"], facts), narration, audio, secs))
+                total += secs
+            if total <= s["max_seconds"]:
                 break
-            feedback = problems
+            problems = [f"영상 길이 {total:.1f}초 > {s['max_seconds']}초"]
+            feedback = problems + [length_feedback(total, s["max_seconds"])]
         if problems:
             db.log_rejection(conn, "video:" + post["slug"], problems)
             return False, problems
 
         m = analyze.gu_monthly(conn, spec["sgg"], spec["gu"], spec["ym"], facts["as_of"])
         trend = align_trend(m["trend"] if m else [], facts)
-
-        s = cfg["shorts"]
-        site = cfg["site"]
-        # 1) 음성을 먼저 만들어 장면 길이를 정한다
-        parts, total = [], 0.0
-        for i, k in enumerate(SHORTS_SCENES):
-            sc = script["scenes"][k]
-            narration = qa.fill(sc["narration"], facts)
-            audio = work / f"{i}.mp3"
-            secs = tts.speak(narration, audio, s["tts_provider"], s["voice"]) + 0.35
-            parts.append((k, qa.fill(sc["headline"], facts), narration, audio, secs))
-            total += secs
-        if total > s["max_seconds"]:
-            problems = [f"영상 길이 {total:.1f}초 > {s['max_seconds']}초"]
-            db.log_rejection(conn, "video:" + post["slug"], problems)
-            return False, problems
 
         # 2) 배경 자료: 실험 변수(clip=스톡 영상, on=사진)를 먼저 시도하고, 안 되면 다른 쪽, 그다음 서울 공통 사진.
         #    모두 실패할 때만 그라데이션(off)

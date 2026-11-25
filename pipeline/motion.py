@@ -44,6 +44,21 @@ def _gradient(th) -> Image.Image:
     return img
 
 
+def is_light(th) -> bool:
+    r, g, b = th["top"]
+    return 0.299 * r + 0.587 * g + 0.114 * b > 140
+
+
+def readable_theme(th, photo_bg) -> dict:
+    """밝은 테마(paper)라도 배경 영상(ClipBackground)은 항상 어둡게 깔리므로 글자색을 밝게 바꾼다.
+
+    11-25 송파 숏츠: paper 테마 진한 남색 제목·블로그 주소가 어두운 야경 영상 위에서 거의 안 보였음.
+    사진 배경은 테마의 위쪽 색으로 덮어 밝게 만들기 때문에 그대로 둔다."""
+    if not isinstance(photo_bg, ClipBackground) or not is_light(th):
+        return th
+    return dict(th, text="#ffffff", muted="#e2e8f0", accent="#fbbf24", chip="#0f172a", cap=(0, 0, 0, 175))
+
+
 def _photo_bg(photo: Path, th) -> Image.Image:
     """사진을 세로 화면보다 조금 크게 맞추고 어둡게 덮는다 (팬 여유 12%)."""
     im = Image.open(photo).convert("RGB")
@@ -128,6 +143,7 @@ def _chunks(narration: str, size: int = 15) -> list[str]:
 class Scene:
     def __init__(self, kind, headline, narration, facts, trend, th, site_title, site_url, seconds,
                  photo_bg=None, credit=None, intro=True):
+        th = readable_theme(th, photo_bg)
         self.kind, self.facts, self.trend, self.th = kind, facts, trend or [], th
         self.seconds, self.intro = seconds, intro
         self.site_title, self.site_url = site_title, site_url
