@@ -538,3 +538,24 @@ class DeadlineNoteTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CarryMediaTest(unittest.TestCase):
+    def test_recent_video_kept_on_rebuild(self):
+        from datetime import datetime, timezone
+        conn = db.connect(":memory:")
+        now = datetime.now(timezone.utc).isoformat()
+        for slug, created in (("seoul-a-2026-09", now), ("seoul-old-2026-01", "2026-01-01T00:00:00+00:00"),
+                              ("seoul-here-2026-09", now)):
+            conn.execute("INSERT INTO videos (slug,title,description,tags,seconds,status,created_at,updated_at)"
+                         " VALUES (?,?,?,?,?,?,?,?)", (slug, "t", "d", "[]", 30, "uploaded", created, created))
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            (out / "media").mkdir()
+            (out / "media" / "seoul-here-2026-09.mp4").write_bytes(b"x")
+            asked = []
+            carried = site._carry_media(conn, {"base_url": "https://ex.github.io"}, out,
+                                        fetch=lambda u: asked.append(u) or b"mp4")
+            self.assertEqual(carried, ["seoul-a-2026-09"])
+            self.assertEqual(asked, ["https://ex.github.io/media/seoul-a-2026-09.mp4"])
+            self.assertTrue((out / "media" / "seoul-a-2026-09.mp4").exists())

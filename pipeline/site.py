@@ -113,7 +113,48 @@ def build(conn, cfg, out=PUBLIC_DIR) -> int:
         for mp4 in video_dir.glob("*.mp4"):
             (out / "media").mkdir(exist_ok=True)
             shutil.copy2(mp4, out / "media" / mp4.name)
+    _carry_media(conn, site, out)
     return len(posts)
+
+
+def _carry_media(conn, site: dict, out, fetch=None) -> list[str]:
+    """최근 며칠 영상 중 이번 빌드에 없는 것을 지금 배포된 사이트에서 받아 다시 넣는다.
+
+    배포는 public/ 전체를 바꾸므로, 그냥 두면 build 모드 재배포나 다음 날 실행이 전날 영상을 지워
+    TikTok 예약 작업(08:10)이 받을 파일이 사라진다 (11-26 송파 9월분). CI에서만 동작(fetch 주입 시 예외).
+    """
+    import os
+    days = int(site.get("carry_media_days", 3))
+    if days <= 0 or (fetch is None and not os.environ.get("GITHUB_ACTIONS")):
+        return []
+    if fetch is None:
+        import requests
+
+        def fetch(url):
+            r = requests.get(url, timeout=60)
+            ok = r.status_code == 200 and r.headers.get("content-type", "").startswith("video")
+            return r.content if ok else None
+    from datetime import timedelta
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
+    try:
+        slugs = [r[0] for r in conn.execute(
+            "SELECT slug FROM videos WHERE created_at >= ?", (since,)).fetchall()]
+    except Exception:
+        return []
+    carried = []
+    for slug in slugs:
+        dest = out / "media" / f"{slug}.mp4"
+        if dest.exists():
+            continue
+        try:
+            data = fetch(f"{site['base_url'].rstrip('/')}/media/{slug}.mp4")
+        except Exception:
+            data = None
+        if data:
+            dest.parent.mkdir(exist_ok=True)
+            dest.write_bytes(data)
+            carried.append(slug)
+    return carried
 
 
 def _jsonld(p: dict, site: dict) -> dict:

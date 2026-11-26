@@ -13,6 +13,7 @@ contact_email = ""                 # 소개/개인정보 페이지에 노출 (�
 adsense_client = ""                # 예: "ca-pub-1234567890" — 승인 후 입력하면 광고 코드 자동 삽입
 google_site_verification = ""      # 서치 콘솔 인증 메타태그 값
 site_verification_files = ["google0ca3dda0f1e228c8.html"]  # 서치 콘솔/네이버 HTML 파일 인증 (삭제 금지)
+carry_media_days = 3              # 빌드마다 최근 N일 영상을 배포된 사이트에서 받아 유지 (TikTok 예약 작업이 받아 감)
 
 [collect]
 # 국토교통부 아파트 매매 실거래가 상세 자료

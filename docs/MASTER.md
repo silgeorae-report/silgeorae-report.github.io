@@ -70,7 +70,7 @@
 | `docs/RESEARCH.md` | 주간 탐색 기록과 구현 대기열 |
 | `pipeline/youtube.py` | YouTube Data API 업로드 (공개) |
 | `pipeline/instagram.py` | 릴스 게시 (시스템 사용자 토큰=graph.facebook.com / IG 토큰=graph.instagram.com) |
-| `pipeline/site.py` | 정적 사이트 빌드, sitemap, media 복사 |
+| `pipeline/site.py` | 정적 사이트 빌드, sitemap, media 복사 (최근 `carry_media_days`일 영상은 배포된 사이트에서 받아 재배포 때도 유지) |
 | `pipeline/run.py` | 명령 진입점 (`all`, `instagram` 등), 비밀값 마스킹 |
 | `scripts/tiktok_prepare.py` | TikTok 업로드 대기열/기록 (`--done <slug>`) |
 | `scripts/set_data_key.ps1`, `setup_instagram.ps1` | 클립보드의 비밀값을 화면에 표시하지 않고 GitHub Secrets에 등록 |
