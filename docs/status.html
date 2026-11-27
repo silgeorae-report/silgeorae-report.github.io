@@ -68,27 +68,27 @@ footer { color: var(--muted); font-size: .82rem }
       <h1>실거래가 리포트 운영 현황</h1>
       <p class="sub">서울 아파트 실거래 데이터로 블로그·YouTube·Instagram·TikTok 콘텐츠를 매일 자동 발행</p>
     </div>
-    <div class="stamp">마지막 갱신 <b>2026-11-27</b><br>다음 자동 실행 <b>11-28 01:00</b></div>
+    <div class="stamp">마지막 갱신 <b>2026-11-28</b><br>다음 자동 실행 <b>11-29 01:00</b></div>
   </header>
 
   <section>
     <h2>채널 상태</h2>
     <div class="channels">
       <div class="ch ok"><span class="name">블로그</span><span class="pill ok">운영 중</span>
-        <span class="num">94 <small>편</small></span>
-        <span class="note">11-25 +8(반려 0) · 11-26 +7(반려 1) · 11-27 +8(반려 0) · 단지별 정리 글 위주 · 서치 콘솔 11-26 등록·사이트맵 제출 · 네이버 소유확인·사이트맵·RSS 제출 · <a href="https://silgeorae-report.github.io/" target="_blank" rel="noopener">silgeorae-report.github.io</a></span></div>
+        <span class="num">101 <small>편</small></span>
+        <span class="note">11-26 +7(반려 1) · 11-27 +8(반려 0) · 11-28 +7(반려 1) · 단지별 정리 글 위주 · 서치 콘솔 11-26 등록·사이트맵 제출 · 네이버 소유확인·사이트맵·RSS 제출 · <a href="https://silgeorae-report.github.io/" target="_blank" rel="noopener">silgeorae-report.github.io</a></span></div>
       <div class="ch ok"><span class="name">YouTube 숏츠</span><span class="pill ok">운영 중</span>
-        <span class="num">33 <small>편 공개</small></span>
-        <span class="note">누적 조회 약 5,034 (측정 28편) · 좋아요 4 · 11-27 강동·중랑 2편 (강동은 ‘짧게 다시 쓰기’로 54.3초 통과)</span></div>
+        <span class="num">35 <small>편 공개</small></span>
+        <span class="note">누적 조회 약 6,044 (측정 30편) · 좋아요 8 · 편당 조회 중앙값 약 170 · 11-28 강남·영등포 2편</span></div>
       <div class="ch warn"><span class="name">Instagram 릴스</span><span class="pill warn">게시 정상 · 조회 미수집</span>
-        <span class="num">24 <small>편</small></span>
-        <span class="note">11-27 강동·중랑 게시 · 조회 수집 실패 원인 확인: 권한 없음(code 10) → 인사이트 권한 넣은 토큰 재발급 필요(사용자 할 일)</span></div>
-      <div class="ch warn"><span class="name">TikTok</span><span class="pill warn">11-26 게시 0편</span>
-        <span class="num">13 <small>편 공개</small></span>
-        <span class="note">11-26 아침 대기열이 비어 게시 없음 — 전날 밤 사이트 재배포가 송파 영상 파일을 지움(11-27 수정) · 11-27 08:10 강동·중랑 예정 · 누적 조회 455 (측정 13편)</span></div>
-      <div class="ch ok"><span class="name">데이터 수집</span><span class="pill ok">정상</span>
+        <span class="num">26 <small>편</small></span>
+        <span class="note">11-28 강남·영등포 게시 · 조회 수집 실패 원인 확인: 권한 없음(code 10) → 인사이트 권한 넣은 토큰 재발급 필요(사용자 할 일)</span></div>
+      <div class="ch ok"><span class="name">TikTok</span><span class="pill ok">게시 재개</span>
+        <span class="num">15 <small>편 공개</small></span>
+        <span class="note">11-27 강동·중랑 게시 · 11-28 08:10 강남·영등포 예정 · 누적 조회 455 (측정 15편, 중앙값 0)</span></div>
+      <div class="ch warn"><span class="name">데이터 수집</span><span class="pill warn">11-28 실패</span>
         <span class="num">25 <small>개 구</small></span>
-        <span class="note">최근 3개월 매일 재수집 · 14개월 보충</span></div>
+        <span class="note">11-28 공공데이터포털이 일반 오류(HTTP ERROR)를 돌려 수집 중단 — 글은 11-27까지 자료로 작성. 일시 장애로 보고 11-29 재확인</span></div>
     </div>
   </section>
 
@@ -112,7 +112,7 @@ footer { color: var(--muted); font-size: .82rem }
         <tr><td>평가</td><td>YouTube·TikTok 조회와 Instagram 좋아요를 매일 수집, 게시 2일 뒤 채널 안 순위로 점수 계산. 11-25에 조회 비율 방식(TikTok 0회 몰림으로 왜곡)에서 순위 방식으로 바꿈</td><td><span class="pill ok">정상</span></td></tr>
         <tr><td>개선</td><td>잘된 조합의 비중을 높이고, 주 1회 Claude가 교훈 도출. 현재 가중치: 스톡 영상 배경 1.47, ember 테마 1.30, 대비형 도입 1.25. 11-26 교훈 갱신 확인(제목에 최고가 단지 실명·거래가, 추세 결론은 본문에서) — 송파 숏츠 제목에 바로 반영</td><td><span class="pill ok">11-26 갱신</span></td></tr>
         <tr><td>적용</td><td>교훈과 비중이 다음 영상의 대본 지침과 화면 설정에 자동 반영</td><td><span class="pill ok">연결됨</span></td></tr>
-        <tr><td>매일 점검</td><td>02:00 Claude가 실행 결과와 새 글·영상을 직접 검토하고 고침, 이 페이지 갱신. 11-25~27 02:00 회차 무인 완주</td><td><span class="pill ok">정상</span></td></tr>
+        <tr><td>매일 점검</td><td>02:00 Claude가 실행 결과와 새 글·영상을 직접 검토하고 고침, 이 페이지 갱신. 11-25~28 02:00 회차 무인 완주</td><td><span class="pill ok">정상</span></td></tr>
         <tr><td>주간 탐색</td><td>월 02:30 인기 Claude 스킬·모션 기법·새 표현을 찾아 기록하고 1개 구현. 마지막 구현 11-16(3D 타임랩스). 11-23 회차는 ‘승인 요청’ 모드로 멈춤 → 다음 11-30</td><td><span class="pill bad">11-23 멈춤</span></td></tr>
       </tbody>
     </table></div>
@@ -146,14 +146,15 @@ footer { color: var(--muted); font-size: .82rem }
     <div class="box">
       <h2>Claude가 할 일</h2>
       <ol>
-        <li>11-27 08:10 TikTok 강동·중랑 게시 확인, 사이트 재배포 뒤에도 최근 영상 주소가 살아 있는지 확인</li>
+        <li>11-29 01:00 수집 재개 확인 — 이틀 연속 실패면 키·활용신청 상태 확인을 사용자 할 일로</li>
+        <li>사이트 재배포 뒤에도 최근 영상 주소가 살아 있는지 확인</li>
         <li>paper 테마+배경 영상 글자 확인 (11-27 두 편은 midnight 테마)</li>
         <li>TikTok 11-15·16 게시 5편만 계속 0인 이유 확인</li>
         <li>Instagram 인사이트: 원인은 권한(code 10) → 새 토큰 받으면 등록·수집 확인</li>
         <li>YouTube 조회가 1~2일 뒤 멈추는 패턴 → 도입부·제목 앞 지역명 실험</li>
         <li>서치 콘솔 사이트맵 상태 ‘성공’ 확인, 데이터 쌓이면 검색 노출·클릭을 학습 고리에 연결</li>
         <li>매 실행 후 새 글·숏츠 직접 품질 검토</li>
-        <li>채널 업로드 감시판 첫 무인 기록 확인 (11-28 TikTok·매일 점검)</li>
+        <li>채널 업로드 감시판: 매일 점검 무인 기록 확인됨(11-28) · 남은 것은 11-28 TikTok 업로드 기록</li>
         <li>12-01 이후 10월분 3D 타임랩스(실제 구 경계 모양) 첫 게시 확인</li>
         <li>전용 이메일이 생기면 소개·개인정보 페이지 연락처 정리</li>
       </ol>
@@ -165,6 +166,8 @@ footer { color: var(--muted); font-size: .82rem }
     <div class="tablewrap"><table>
       <thead><tr><th>발견한 문제</th><th>범위</th><th>조치</th></tr></thead>
       <tbody>
+        <tr><td>수집이 실패한 날에도 글 하단·본문에 ‘오늘(11-28) 수집 기준’이 찍힘</td><td>11-28 글 7편</td><td>수집 실패 시 마지막으로 거래가 들어온 날을 기준일로 쓰도록 수정, 7편 날짜를 11-27로 고침 · 테스트 추가(45개 통과)</td></tr>
+        <tr><td>11-28 새 글 7편·숏츠 2편(강남·영등포)</td><td>직접 열람·프레임 확인</td><td>변동률·면적 건수·최고가 모두 표와 일치. 주공2 FAQ ‘조건이 다른 개별 거래’ 단정을 ‘다를 수 있는’으로 수정. 영상 글자 겹침·빈 화면 없음, 배경(한강·서울 야경) 적절</td></tr>
         <tr><td>11-26 아침 TikTok 대기열이 비어 게시 0편 — 11-26 06:35 ‘사이트만 다시 배포’ 실행이 송파 영상 파일을 사이트에서 지움</td><td>TikTok 11-26</td><td>빌드 때 최근 3일 영상 중 빠진 것을 지금 사이트에서 받아 다시 넣도록 수정 · 테스트 추가(44개 통과)</td></tr>
         <tr><td>11-27 새 글 8편·숏츠 2편(강동·중랑)</td><td>직접 열람·프레임 확인</td><td>변동률·면적 건수·최고가·소재지 모두 표와 일치, 금지 표현 없음. 영상 글자 겹침·빈 화면 없음, 배경(서울 야경·한강) 적절 — 수정 없음</td></tr>
         <tr><td>송파 숏츠: 밝은(paper) 테마의 진한 제목·블로그 주소가 어두운 배경 영상 위에서 거의 안 보임</td><td>11-26 숏츠 (이미 게시)</td><td>배경 영상이 깔리는 장면은 밝은 글자로 자동 전환, 렌더해 보고 확인 · 테스트 추가</td></tr>
@@ -208,6 +211,7 @@ footer { color: var(--muted); font-size: .82rem }
     <div class="tablewrap"><table>
       <thead><tr><th>날짜</th><th>변경</th><th>커밋</th></tr></thead>
       <tbody>
+        <tr><td class="date">11-28</td><td>매일 점검(02:00 무인 완주): 수집이 공공데이터포털 오류로 실패했지만 글 7편·숏츠 2편(강남·영등포) 정상 게시. 수집 실패일의 글 기준일 표기 수정, 주공2 단정 표현 1곳 수정. 채널 대조 YouTube 35·TikTok 15 모두 기록과 일치</td><td class="c">c240e69</td></tr>
         <tr><td class="date">11-27</td><td>세 채널 공동 채널 업로드 감시판 참여 — 첫 대조: YouTube 33편·TikTok 15편 모두 우리 기록과 일치, 다른 채널 영상 없음. 크롬 2개 연결 대비 TikTok 업로드 전 계정 확인 추가</td><td class="c">—</td></tr>
         <tr><td class="date">11-27</td><td>매일 점검(02:00 무인 완주): 글 8편 발행·반려 0, 숏츠 강동·중랑 YouTube·Instagram 게시. 검토 결과 수정 없음. 사이트 재배포가 최근 영상을 지워 TikTok 11-26 게시가 빠진 문제 수정</td><td class="c">(이 커밋)</td></tr>
         <tr><td class="date">11-27</td><td>네이버 서치어드바이저 인증 파일 배포 (사이트 추가는 사용자), 재배포 뒤 최근 영상 주소 유지 확인</td><td class="c">4ea99d9</td></tr>
