@@ -93,7 +93,8 @@
 ## 6. 운영 방법
 - 수동 실행: GitHub → Actions → daily-pipeline → Run workflow (또는 `gh workflow run daily-pipeline --repo silgeorae-report/silgeorae-report.github.io`). `-f mode=build` 를 주면 사이트만 다시 빌드·배포(콘텐츠 생성·업로드·릴스 없음)
 - 검색엔진 인증: Google 서치 콘솔(URL 접두어 속성, HTML 파일 인증), 네이버 서치어드바이저(HTML 파일 인증 — 크롬 확장으로는 접근 불가, 사용자가 직접 조작). 서치 콘솔 속성이 있는 Google 계정은 실거래가 쪽 크롬(deviceId 7f432d41…)에 로그인돼 있음.
-- 크롬 2개 연결(11-27): 이 Claude 계정에 실거래가 쪽(deviceId 7f432d41…, 이 PC)과 한컷국어 쪽(deviceId 89e6d5b1…, 다른 PC·다른 채널) 크롬이 함께 연결됨. 표시 이름(Browser 1/2, MINI)은 바뀌므로 deviceId로 고르고, 크롬 작업 전에 계정(TikTok '프로필 편집' 보임, YouTube Studio가 실거래가 리포트 채널)을 확인. 한컷국어 쪽 크롬에는 탭을 열거나 올리지 않음. TikTok 예약 작업 0단계에 반영 인증 파일명은 `config.toml` 의 `site_verification_files` — 빌드마다 배포되므로 지우지 말 것. 사이트맵 `sitemap.xml` 제출됨
+- 크롬 2개 연결(11-27): 이 Claude 계정에 실거래가 쪽(deviceId 7f432d41…, 이 PC)과 한컷국어 쪽(deviceId 89e6d5b1…, 다른 PC·다른 채널) 크롬이 함께 연결됨. 표시 이름(Browser 1/2, MINI)은 바뀌므로 deviceId로 고르고, 크롬 작업 전에 계정(TikTok '프로필 편집' 보임, YouTube Studio가 실거래가 리포트 채널)을 확인. 한컷국어 쪽 크롬에는 탭을 열거나 올리지 않음. TikTok 예약 작업 0단계에 반영
+- 채널 업로드 감시판(세 채널 공동, 11-27~): https://claude.ai/artifact/2xRjyyuFaj2dxB2CR4Cbfe — 채널 키 realestate. TikTok 예약 작업이 uploads 기록, 매일 점검 2-5단계가 YouTube uploads 기록·Studio/TikTok 전체 대조(checks)·의심 시 alerts(삭제·비공개는 운영자 확인 뒤)·다른 채널 경보 확인. 다른 채널 문서는 읽기만 인증 파일명은 `config.toml` 의 `site_verification_files` — 빌드마다 배포되므로 지우지 말 것. 사이트맵 `sitemap.xml` 제출됨
 - 긴급 중단: 저장소 변수 `PIPELINE_ENABLED=false` 또는 `config.toml`의 `[safety] enabled=false`
 - 로컬 테스트: `.venv\Scripts\python.exe -m unittest discover -s tests`
 - 비밀값 교체: 값을 Ctrl+C → `scripts\set_data_key.ps1` 또는 `scripts\setup_instagram.ps1 -IgUserId <ID>`
