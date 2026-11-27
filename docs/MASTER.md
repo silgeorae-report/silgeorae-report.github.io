@@ -92,7 +92,7 @@
 
 ## 6. 운영 방법
 - 수동 실행: GitHub → Actions → daily-pipeline → Run workflow (또는 `gh workflow run daily-pipeline --repo silgeorae-report/silgeorae-report.github.io`). `-f mode=build` 를 주면 사이트만 다시 빌드·배포(콘텐츠 생성·업로드·릴스 없음)
-- 검색엔진 인증: Google 서치 콘솔(URL 접두어 속성, HTML 파일 인증). 인증 파일명은 `config.toml` 의 `site_verification_files` — 빌드마다 배포되므로 지우지 말 것. 사이트맵 `sitemap.xml` 제출됨
+- 검색엔진 인증: Google 서치 콘솔(URL 접두어 속성, HTML 파일 인증), 네이버 서치어드바이저(HTML 파일 인증 — 크롬 확장으로는 접근 불가, 사용자가 직접 조작). 인증 파일명은 `config.toml` 의 `site_verification_files` — 빌드마다 배포되므로 지우지 말 것. 사이트맵 `sitemap.xml` 제출됨
 - 긴급 중단: 저장소 변수 `PIPELINE_ENABLED=false` 또는 `config.toml`의 `[safety] enabled=false`
 - 로컬 테스트: `.venv\Scripts\python.exe -m unittest discover -s tests`
 - 비밀값 교체: 값을 Ctrl+C → `scripts\set_data_key.ps1` 또는 `scripts\setup_instagram.ps1 -IgUserId <ID>`

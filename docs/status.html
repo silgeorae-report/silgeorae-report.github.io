@@ -76,7 +76,7 @@ footer { color: var(--muted); font-size: .82rem }
     <div class="channels">
       <div class="ch ok"><span class="name">블로그</span><span class="pill ok">운영 중</span>
         <span class="num">94 <small>편</small></span>
-        <span class="note">11-25 +8(반려 0) · 11-26 +7(반려 1) · 11-27 +8(반려 0) · 단지별 정리 글 위주 · 서치 콘솔 11-26 등록·사이트맵 제출 · <a href="https://silgeorae-report.github.io/" target="_blank" rel="noopener">silgeorae-report.github.io</a></span></div>
+        <span class="note">11-25 +8(반려 0) · 11-26 +7(반려 1) · 11-27 +8(반려 0) · 단지별 정리 글 위주 · 서치 콘솔 11-26 등록·사이트맵 제출 · 네이버 인증 파일 배포 · <a href="https://silgeorae-report.github.io/" target="_blank" rel="noopener">silgeorae-report.github.io</a></span></div>
       <div class="ch ok"><span class="name">YouTube 숏츠</span><span class="pill ok">운영 중</span>
         <span class="num">33 <small>편 공개</small></span>
         <span class="note">누적 조회 약 5,034 (측정 28편) · 좋아요 4 · 11-27 강동·중랑 2편 (강동은 ‘짧게 다시 쓰기’로 54.3초 통과)</span></div>
@@ -122,6 +122,7 @@ footer { color: var(--muted); font-size: .82rem }
     <div class="box">
       <h2>사용자가 할 일</h2>
       <ul>
+        <li><b>네이버 서치어드바이저</b> — 인증 파일 배포 완료. 화면에서 ‘소유확인’ → 요청 메뉴에서 sitemap.xml·feed.xml 제출 (크롬 확장이 네이버를 막아 Claude가 못 엶)</li>
         <li><b>Instagram 조회 수집 권한</b> — 인사이트 요청이 ‘권한 없음(code 10)’으로 거부됨. 시스템 사용자 토큰을 instagram_manage_insights 권한 포함해 새로 발급 (등록은 Claude와 대화에서). 게시는 정상</li>
         <li class="done">예약 작업 승인 대기 멈춤(11-22~24) — 11-25·26 점검, 11-25 TikTok 모두 무인 완주로 해결된 것으로 봄</li>
         <li class="done">크롬에서 TikTok 다시 로그인 (11-19)</li>
@@ -153,7 +154,7 @@ footer { color: var(--muted); font-size: .82rem }
         <li>서치 콘솔 사이트맵 상태 ‘성공’ 확인, 데이터 쌓이면 검색 노출·클릭을 학습 고리에 연결</li>
         <li>매 실행 후 새 글·숏츠 직접 품질 검토</li>
         <li>12-01 이후 10월분 3D 타임랩스(실제 구 경계 모양) 첫 게시 확인</li>
-        <li>네이버 서치어드바이저 등록 (Google 서치 콘솔은 11-26 완료)</li>
+        <li>네이버 서치어드바이저 수집 상태 확인 (사용자 소유확인·제출 뒤)</li>
         <li>전용 이메일이 생기면 소개·개인정보 페이지 연락처 정리</li>
       </ol>
     </div>
@@ -208,6 +209,7 @@ footer { color: var(--muted); font-size: .82rem }
       <thead><tr><th>날짜</th><th>변경</th><th>커밋</th></tr></thead>
       <tbody>
         <tr><td class="date">11-27</td><td>매일 점검(02:00 무인 완주): 글 8편 발행·반려 0, 숏츠 강동·중랑 YouTube·Instagram 게시. 검토 결과 수정 없음. 사이트 재배포가 최근 영상을 지워 TikTok 11-26 게시가 빠진 문제 수정</td><td class="c">(이 커밋)</td></tr>
+        <tr><td class="date">11-27</td><td>네이버 서치어드바이저 인증 파일 배포 (사이트 추가는 사용자), 재배포 뒤 최근 영상 주소 유지 확인</td><td class="c">4ea99d9</td></tr>
         <tr><td class="date">11-26</td><td>Google 서치 콘솔 등록·소유권 인증, 사이트맵 제출 · 사이트만 다시 배포하는 수동 실행 모드 추가</td><td class="c">8a02872</td></tr>
         <tr><td class="date">11-26</td><td>매일 점검(02:00 무인 완주): 글 7편 발행·반려 1, 숏츠 송파 1편 게시(강동 길이 초과). paper 테마 글자 가독성·숏츠 길이 재시도·단지 글 지침(층 정보, ‘매물’) 수정, 강변 글 2곳 고침. 테스트 43개 통과. 학습 교훈 갱신 확인</td><td class="c">2a72527</td></tr>
         <tr><td class="date">11-25</td><td>학습 고리 점검: TikTok 0회 몰림으로 점수가 왜곡돼 가중치가 모두 상한에 붙어 있던 것 발견 → 채널 안 순위 점수로 변경·재계산. 교훈 갱신 주기 보정. 주간 탐색 11-23 멈춤 확인</td><td class="c">c53bf95</td></tr>
