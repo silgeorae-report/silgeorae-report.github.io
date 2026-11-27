@@ -561,3 +561,16 @@ class CarryMediaTest(unittest.TestCase):
             self.assertEqual(carried, ["seoul-a-2026-09"])
             self.assertEqual(asked, ["https://ex.github.io/media/seoul-a-2026-09.mp4"])
             self.assertTrue((out / "media" / "seoul-a-2026-09.mp4").exists())
+
+
+class DataAsOfTest(unittest.TestCase):
+    def test_collect_failure_uses_last_collected_date(self):
+        from datetime import datetime, timezone
+        from pipeline import run
+        conn = db.connect(":memory:")
+        conn.execute("INSERT INTO trades (id, sgg_cd, apt_name, area, deal_date, deal_ym, price, collected_at) "
+                     "VALUES ('t1', '11350', 'a', 59.9, '2026-10-01', '202610', 1, '2026-11-26T16:10:00+00:00')")
+        now = datetime(2026, 11, 28, 1, 30, tzinfo=run.KST)
+        self.assertEqual(run.data_as_of(conn, {"errors": []}, now), "2026-11-28")
+        failed = {"errors": ["collect: CollectError: API 인증 오류: HTTP 에러"]}
+        self.assertEqual(run.data_as_of(conn, failed, now), "2026-11-27")  # UTC 16:10 = KST 다음 날 01:10

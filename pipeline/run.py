@@ -73,6 +73,20 @@ def do_collect(conn, cfg, summary, demo=False):
         raise RuntimeError("모든 수집 요청이 실패했습니다: " + errors[0])
 
 
+def data_as_of(conn, summary, now) -> str:
+    """글 하단 '수집 기준' 날짜. 이번 수집이 실패했으면 오늘이 아니라 마지막으로 거래가 들어온 날."""
+    today = now.strftime("%Y-%m-%d")
+    if not any(str(e).startswith("collect:") for e in summary.get("errors", [])):
+        return today
+    last = conn.execute("SELECT MAX(collected_at) FROM trades").fetchone()[0]
+    if not last:
+        return today
+    try:
+        return datetime.fromisoformat(last).astimezone(KST).strftime("%Y-%m-%d")
+    except ValueError:
+        return today
+
+
 def do_generate(conn, cfg, summary, fake=False):
     if not cfg["safety"]["enabled"]:
         log("safety.enabled=false → 생성 건너뜀 (킬 스위치)")
@@ -82,11 +96,12 @@ def do_generate(conn, cfg, summary, fake=False):
     writer = FakeWriter() if fake else ClaudeWriter(cfg["generate"]["model"], cfg["generate"]["effort"])
     now = datetime.now(KST)
     jobs = generate.plan(conn, cfg, now.date())
-    log(f"작업 {len(jobs)}건 계획됨")
+    as_of = data_as_of(conn, summary, now)
+    log(f"작업 {len(jobs)}건 계획됨 (자료 기준일 {as_of})")
     ok, failed, streak = [], [], 0
     for job in jobs:
         try:
-            success, problems = generate.produce(conn, cfg, writer, job, now.strftime("%Y-%m-%d"))
+            success, problems = generate.produce(conn, cfg, writer, job, as_of)
         except Exception as e:
             success, problems = False, [f"{type(e).__name__}: {e}"]
         if success:
