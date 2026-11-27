@@ -154,6 +154,8 @@ class EndToEndTest(unittest.TestCase):
             vf = out / "google0ca3dda0f1e228c8.html"
             self.assertEqual(vf.read_text(encoding="utf-8").strip(),
                              "google-site-verification: google0ca3dda0f1e228c8.html")
+            self.assertEqual((out / "naverbfd29d919134007c40e4b91c4b161d16.html").read_text(encoding="utf-8").strip(),
+                             "naver-site-verification: naverbfd29d919134007c40e4b91c4b161d16.html")
             html = (out / "posts" / jobs[0]["slug"] / "index.html").read_text(encoding="utf-8")
             self.assertNotIn("{{", html)
             conn.close()
